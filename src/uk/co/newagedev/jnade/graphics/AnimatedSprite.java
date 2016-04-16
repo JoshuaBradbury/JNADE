@@ -35,19 +35,23 @@ public class AnimatedSprite implements Renderable {
 	public int getHeight() {
 		return sprites[currFrame].getHeight();
 	}
+	
+	public int getFrame() {
+		return currFrame;
+	}
 
 	public Sprite[] loadAnimation(String path, int framesX, int framesY, int frameStart, int frameEnd) {
 		Sprite[] spriteArray = new Sprite[frameEnd - frameStart + 1];
 
 		BufferedImage img = Sprite.loadImageFile(path);
-
+		
 		int tileWidth = img.getWidth() / framesX, tileHeight = img.getHeight() / framesY;
 
 		int workingFrame = 0;
 		for (int y = 0; y < framesY; y++) {
 			for (int x = 0; x < framesX; x++) {
 				if (workingFrame >= frameStart && workingFrame <= frameEnd) {
-					spriteArray[workingFrame] = new Sprite(img.getSubimage(x * tileWidth, y * tileHeight, tileWidth, tileHeight));
+					spriteArray[workingFrame - frameStart] = new Sprite(img.getSubimage(x * tileWidth, y * tileHeight, tileWidth, tileHeight));
 				}
 				workingFrame++;
 			}
