@@ -6,8 +6,6 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import uk.co.newagedev.jnade.Main;
-
 public class Sprite implements Renderable {
 
 	private int[] pixels;
@@ -34,12 +32,6 @@ public class Sprite implements Renderable {
 			pixels = new int[image.getWidth() * image.getHeight()];
 			for (int x = 0; x < image.getWidth(); x++) {
 				for (int y = 0; y < image.getHeight(); y++) {
-					if (Main.RENDERABLE_REGISTRY.getRemoveColour() != null) {
-						if (image.getRGB(x, y) == Main.RENDERABLE_REGISTRY.getRemoveColour().getRGB()) {
-							pixels[x + image.getWidth() * y] = -1;
-							continue;
-						}
-					}
 					pixels[x + image.getWidth() * y] = image.getRGB(x, y);
 				}
 			}

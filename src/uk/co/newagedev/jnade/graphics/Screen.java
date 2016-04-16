@@ -9,6 +9,7 @@ import java.awt.image.DataBufferInt;
 import java.util.ArrayList;
 import java.util.List;
 
+import uk.co.newagedev.jnade.Main;
 import uk.co.newagedev.jnade.input.KeyBinding;
 import uk.co.newagedev.jnade.input.Mouse;
 
@@ -66,6 +67,8 @@ public class Screen extends Canvas {
 			pixels[i] = bg.getRGB();
 		}
 		
+		Color removeColour = Main.RENDERABLE_REGISTRY.getRemoveColour();
+		
 		for (DrawTask task : tasks) {
 			switch (task.type) {
 			case IMAGE:
@@ -74,9 +77,12 @@ public class Screen extends Canvas {
 				for (int x = 0; x < w; x++) {
 					for (int y = 0; y < h; y++) {
 						int pixel = imgPixels[x + w * y];
-						if (pixel != -1) {
-							pixels[(task.x * scale + x) + width * (task.y * scale + y)] = pixel;
+						if (removeColour != null) {
+							if (pixel == removeColour.getRGB()) {
+								continue;
+							}
 						}
+						pixels[(task.x * scale + x) + width * (task.y * scale + y)] = pixel;
 					}
 				}
 				break;
@@ -88,7 +94,8 @@ public class Screen extends Canvas {
 				int x_ = task.x * scale, y_ = task.y * scale, w_ = (int) task.params[0] * scale, h_ = (int) task.params[1] * scale;
 				for (int x = x_; x < x_ + w_; x++) {
 					for (int y = y_; y < y_ + h_; y++) {
-						pixels[x + width * y] = colour.getRGB();
+						if (x < width && x >= 0 && y < height && y >= 0)
+							pixels[x + width * y] = colour.getRGB();
 					}
 				}
 				break;
