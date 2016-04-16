@@ -27,7 +27,15 @@ public class Location {
 		return new Location(x + root.x, y + root.y);
 	}
 	
+	public boolean equals(Location loc) {
+		return this.x == loc.x && this.y == loc.y;
+	}
+	
 	public String toString() {
 		return "(" + x + ", " + y + ")";
+	}
+	
+	public Location clone() {
+		return new Location(x, y);
 	}
 }
