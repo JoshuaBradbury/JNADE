@@ -3,7 +3,7 @@ package uk.co.newagedev.jnade.map;
 import java.util.ArrayList;
 import java.util.List;
 
-import uk.co.newagedev.jnade.util.Location;
+import uk.co.newagedev.jnade.util.Vector2f;
 
 public abstract class MapStructure extends MapObject {
 
@@ -21,14 +21,14 @@ public abstract class MapStructure extends MapObject {
 		return objects;
 	}
 	
-	public MapStructure(Location location) {
+	public MapStructure(Vector2f location) {
 		setLocation(location);
 	}
 	
 	public void render() {
 		for (MapObject object : objects) {
-			Location loc = object.getLocation();
-			object.setLocation(object.getLocation().getRelativeTo(getLocation()));
+			Vector2f loc = object.getLocation();
+			object.setLocation(object.getLocation().add(getLocation()));
 			object.render();
 			object.setLocation(loc);
 		}
@@ -36,8 +36,8 @@ public abstract class MapStructure extends MapObject {
 	
 	public void update() {
 		for (MapObject object : objects) {
-			Location loc = object.getLocation();
-			object.setLocation(object.getLocation().getRelativeTo(getLocation()));
+			Vector2f loc = object.getLocation();
+			object.setLocation(object.getLocation().add(getLocation()));
 			object.update();
 			object.setLocation(loc);
 		}

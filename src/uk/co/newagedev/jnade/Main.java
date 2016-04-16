@@ -5,20 +5,20 @@ import java.awt.Color;
 import javax.swing.JFrame;
 
 import uk.co.newagedev.jnade.audio.AudioRegistry;
-import uk.co.newagedev.jnade.graphics.RenderableRegistry;
-import uk.co.newagedev.jnade.graphics.Screen;
 import uk.co.newagedev.jnade.input.KeyBinding;
-import uk.co.newagedev.jnade.input.Mouse;
+import uk.co.newagedev.jnade.openglgraphics.OpenGLScreen;
+import uk.co.newagedev.jnade.openglgraphics.SpriteRegistry;
+import uk.co.newagedev.jnade.util.Logger;
 
 public class Main implements Runnable {
 
-	private static final int MAX_UPS = 60;
-	public static Screen screen;
-	private static KeyBinding keyboard = new KeyBinding();
-	private static Mouse mouse = new Mouse();
-	public static final RenderableRegistry RENDERABLE_REGISTRY = new RenderableRegistry();
+	private static OpenGLScreen screen;
+	public static int WIDTH, HEIGHT;
+	public static String TITLE;
+	public static final SpriteRegistry RENDERABLE_REGISTRY = new SpriteRegistry();
 	public static final AudioRegistry AUDIO_REGISTRY = new AudioRegistry();
-	public int ups, fps, width = 100, height = 100, scale = 1;
+	public static final int SPRITE_WIDTH = 32, SPRITE_HEIGHT = 32;
+	public int ups, fps, width = 100, height = 100;
 	public String title;
 	public boolean running;
 	public JFrame frame;
@@ -27,6 +27,10 @@ public class Main implements Runnable {
 	private TaskScheduler scheduler = new TaskScheduler();
 	
 	public Color bg = Color.WHITE;
+	
+	public static OpenGLScreen getScreen() {
+		return screen;
+	}
 	
 	// Game Screen Settings Methods Start
 	
@@ -46,25 +50,19 @@ public class Main implements Runnable {
 		this.width = width;
 		this.height = height;
 	}
-
-	public void setScreenScale(int scale) {
-		this.scale = scale;
-		RENDERABLE_REGISTRY.scaleAll(scale);
-	}
 	
 	// Game Window Settings Methods End
 	
-	public int getWidth() {
-		return screen.getWidth();
+	public static int getWidth() {
+		return WIDTH;
 	}
 	
-	public int getHeight() {
-		return screen.getHeight();
+	public static int getHeight() {
+		return HEIGHT;
 	}
 
 	public void setGame(Game game) {
 		this.game = game;
-		game.init();
 	}
 	
 	public Game getGame() {
@@ -72,75 +70,57 @@ public class Main implements Runnable {
 	}
 	
 	public void init() {
-		screen = new Screen(width, height, scale, keyboard, mouse);
-		screen.setBackgroundColour(bg);
-		
-		frame = new JFrame();
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setSize(width * scale, height * scale);
-		frame.setLocationRelativeTo(null);
-		frame.setResizable(false);
-		frame.setTitle(title);
-
-		frame.add(screen);
-		frame.pack();
-
-		frame.setVisible(true);
-		
-		Mouse.MAIN_INSTANCE = this;
+		Main.WIDTH = width;
+		Main.HEIGHT = height;
+		Main.TITLE = title;
+		screen = new OpenGLScreen();
+		screen.setClearColour(bg.getRed(), bg.getGreen(), bg.getBlue(), bg.getAlpha());
+		game.init();
 	}
 
 	public synchronized void start() {
+		thread = new Thread("JNADE");
 		running = true;
-		thread = new Thread(this, "JNADE");
-
 		init();
 		run();
 	}
 
 	public synchronized void stop() {
-		running = false;
 		try {
 			thread.join();
 		} catch (InterruptedException e) {
-			e.printStackTrace();
+			Logger.error(e.getMessage());
+			for (Object obj : e.getStackTrace()) {
+				Logger.error(obj);
+			}
 		}
-		frame.dispose();
+		running = false;
 	}
 
 	public void run() {
-		long lastTime = System.nanoTime();
 		long secondTime = System.currentTimeMillis();
-		final double ns = 1000000000 / MAX_UPS;
-		double delta = 0;
+		int fps = 0;
 		while (running) {
+			update();
+			screen.renderInit();
 			game.render();
-			screen.render();
+			screen.postRender();
 			fps++;
-
-			long now = System.nanoTime();
-			delta += (now - lastTime) / ns;
-			lastTime = now;
-
-			while (delta >= 1) {
-				update();
-				ups++;
-				delta--;
-			}
-
 			if (System.currentTimeMillis() - secondTime >= 1000) {
-				frame.setTitle(title + " FPS: " + fps + " UPS: " + ups);
+				screen.setTitle(TITLE + "     FPS: " + fps);
 				secondTime += 1000;
 				fps = 0;
-				ups = 0;
+			}
+			if (screen.shouldClose()) {
+				stop();
 			}
 		}
 		AUDIO_REGISTRY.cleanUp();
+		screen.cleanup();
 	}
 	
 	public void update() {
 		KeyBinding.update();
-		Mouse.update();
 		scheduler.update();
 		game.update();
 	}

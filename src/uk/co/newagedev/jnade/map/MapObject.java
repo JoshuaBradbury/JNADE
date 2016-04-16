@@ -1,11 +1,11 @@
 package uk.co.newagedev.jnade.map;
 
-import uk.co.newagedev.jnade.util.Location;
+import uk.co.newagedev.jnade.util.Vector2f;
 
 public abstract class MapObject {
 
 	private Map map;
-	private Location location;
+	private Vector2f location;
 	
 	public abstract void render();
 	
@@ -13,11 +13,11 @@ public abstract class MapObject {
 	
 	public abstract void init();
 	
-	public Location getLocation() {
+	public Vector2f getLocation() {
 		return location;
 	}
 	
-	public void setLocation(Location location) {
+	public void setLocation(Vector2f location) {
 		this.location = location;
 	}
 	
