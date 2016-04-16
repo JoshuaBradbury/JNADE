@@ -4,8 +4,9 @@ import java.awt.Color;
 
 import javax.swing.JFrame;
 
-import uk.co.newagedev.jnade.graphics.Screen;
+import uk.co.newagedev.jnade.audio.AudioRegistry;
 import uk.co.newagedev.jnade.graphics.RenderableRegistry;
+import uk.co.newagedev.jnade.graphics.Screen;
 import uk.co.newagedev.jnade.input.KeyBinding;
 import uk.co.newagedev.jnade.input.Mouse;
 
@@ -16,6 +17,7 @@ public class Main implements Runnable {
 	private static KeyBinding keyboard = new KeyBinding();
 	private static Mouse mouse = new Mouse();
 	public static final RenderableRegistry RENDERABLE_REGISTRY = new RenderableRegistry();
+	public static final AudioRegistry AUDIO_REGISTRY = new AudioRegistry();
 	public int ups, fps, width = 100, height = 100, scale = 1;
 	public String title;
 	public boolean running;
@@ -133,6 +135,7 @@ public class Main implements Runnable {
 				ups = 0;
 			}
 		}
+		AUDIO_REGISTRY.cleanUp();
 	}
 	
 	public void update() {
