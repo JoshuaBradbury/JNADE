@@ -82,7 +82,8 @@ public class Screen extends Canvas {
 								continue;
 							}
 						}
-						pixels[(task.x * scale + x) + width * (task.y * scale + y)] = pixel;
+						if (task.x * scale + x < width && task.x * scale + x >= 0 && task.y * scale + y < height && task.y * scale + y >= 0)
+							pixels[(task.x * scale + x) + width * (task.y * scale + y)] = pixel;
 					}
 				}
 				break;
