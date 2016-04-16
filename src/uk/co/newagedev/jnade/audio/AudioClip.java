@@ -23,9 +23,18 @@ public class AudioClip {
 		return clip.isRunning();
 	}
 
-	public void play() {
+	public void playOnce() {
 		if (!isPlaying()) {
 			clip.setFramePosition(0);
+			clip.loop(0);
+			clip.start();
+		}
+	}
+	
+	public void playLoop() {
+		if (!isPlaying()) {
+			clip.setFramePosition(0);
+			clip.loop(Clip.LOOP_CONTINUOUSLY);
 			clip.start();
 		}
 	}
